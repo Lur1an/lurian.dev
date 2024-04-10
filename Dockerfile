@@ -1,5 +1,5 @@
 # Step 1: Build the application
-FROM oven/bun AS builder
+FROM --platform=linux/amd64 oven/bun AS builder
 
 # Set the working directory in the container
 WORKDIR /app
