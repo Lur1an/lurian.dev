@@ -6,7 +6,7 @@
 		{ href: '/', text: 'Home', icon: faHouse },
 		{ href: '/blog', text: 'Blog', icon: faBook },
 		{ href: '/playground', text: 'Playground', icon: faGamepad },
-		{ href: '/memes', text: 'Memes', icon: faHippo },
+		{ href: '/memes', text: 'Memes & Fun', icon: faHippo },
 	];
 
 	$: classesActive = (href: string) => {
