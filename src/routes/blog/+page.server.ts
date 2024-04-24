@@ -1,10 +1,9 @@
 import type { Post } from '$lib/types';
+import { type LoadEvent } from '@sveltejs/kit';
 
-export async function load({ fetch, url }) {
-    console.info("Loading blogpost", url)
-	const resp = await fetch(
-        'api/posts?' + url.searchParams, 
-    );
+export async function load({ fetch }: LoadEvent) {
+	const resp = await fetch('api/posts');
 	const posts: Post[] = await resp.json();
-	return { posts };
+	const allCategories = new Set(posts.map((post) => post.categories).flat());
+	return { posts, allCategories };
 }

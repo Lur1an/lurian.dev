@@ -1,2 +1,5 @@
-<a href="/playground/snek">Snek</a>
-<a href="/playground/3dstuff">3DStuff</a>
+<a href="/playground/snek">
+    <div class="card card-hover">
+
+    </div>
+</a>

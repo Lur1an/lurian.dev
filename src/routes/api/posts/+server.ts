@@ -2,8 +2,7 @@ import { formatDateString } from '$lib';
 import type { Post } from '$lib/types';
 import { json, type RequestEvent } from '@sveltejs/kit';
 
-async function getPosts(searchParams: URLSearchParams) {
-    console.info('API: getPosts', searchParams)
+async function getPosts() {
 	let posts: Post[] = [];
 	const paths = import.meta.glob('/src/posts/*.md', { eager: true });
 	for (let [path, file] of Object.entries(paths)) {
@@ -17,14 +16,10 @@ async function getPosts(searchParams: URLSearchParams) {
 		}
 	}
 	posts.sort((d1, d2) => new Date(d2.date).getTime() - new Date(d1.date).getTime());
-	const category = searchParams.get('category');
-	if (category) {
-		posts = posts.filter((post) => post.categories.includes(category));
-	}
 	return posts;
 }
 
-export async function GET({ url }: RequestEvent) {
-	const posts = await getPosts(url.searchParams);
+export async function GET() {
+	const posts = await getPosts();
 	return json(posts);
 }

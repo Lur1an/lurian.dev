@@ -18,6 +18,19 @@ enum Direction {
 	RIGHT
 }
 
+function oppositeDirection(d: Direction): Direction {
+    switch (d) {
+        case Direction.UP:
+            return Direction.DOWN;
+        case Direction.DOWN:
+            return Direction.UP;
+        case Direction.LEFT:
+            return Direction.RIGHT;
+        case Direction.RIGHT:
+            return Direction.LEFT;
+    }
+}
+
 enum BoardChunk {
 	EMPTY,
 	FOOD,
@@ -72,8 +85,8 @@ class Snek {
 		}
 		this.tail.next = node;
 		this.tail = node;
-        this.length++;
-        console.info(this);
+		this.length++;
+		console.info(this);
 	}
 }
 
@@ -90,7 +103,7 @@ class GameEngine {
 	constructor(height: number, width: number, hooks: Writable<BoardChunk>[][]) {
 		this.board = new Array(height);
 		this.boardHooks = new Array(height);
-        this.boardHooks = hooks;
+		this.boardHooks = hooks;
 		for (let i = 0; i < height; i++) {
 			this.board[i] = new Array(width);
 			this.boardHooks[i] = new Array(width);
@@ -105,15 +118,15 @@ class GameEngine {
 	}
 
 	setDirection(direction: Direction) {
-        const nextSquare = adjacentCoords(
-            { x: this.snek.head.x, y: this.snek.head.y },
-            direction,
-            this.height(),
-            this.width()
-        )
-        if (this.board[nextSquare.x][nextSquare.y] === BoardChunk.SNEK) {
-            return;
-        }
+		const nextSquare = adjacentCoords(
+			{ x: this.snek.head.x, y: this.snek.head.y },
+			direction,
+			this.height(),
+			this.width()
+		);
+		if (this.board[nextSquare.x][nextSquare.y] === BoardChunk.SNEK) {
+			return;
+		}
 		this.direction = direction;
 	}
 
@@ -133,16 +146,16 @@ class GameEngine {
 
 	move(x: number, y: number): void {
 		let currentNode: SnekNode | null = this.snek.head;
-        let moveX = x;
-        let moveY = y;
+		let moveX = x;
+		let moveY = y;
 		while (currentNode !== null) {
-            let oldX = currentNode.x;
-            let oldY = currentNode.y;
+			let oldX = currentNode.x;
+			let oldY = currentNode.y;
 			currentNode.x = moveX;
 			currentNode.y = moveY;
 			this.updateBoard(currentNode.x, currentNode.y, BoardChunk.SNEK);
-            // Move the next part of the snek to the position of the previous part
-            currentNode = currentNode.next;
+			// Move the next part of the snek to the position of the previous part
+			currentNode = currentNode.next;
 			moveX = oldX;
 			moveY = oldY;
 		}
@@ -163,6 +176,27 @@ class GameEngine {
 		this.updateBoard(chunk.x, chunk.y, BoardChunk.FOOD);
 	}
 
+    reverse(): void {
+        console.info('Reversing snek');
+        let node: SnekNode | null = this.snek.head;
+        const stack = [];
+        while (node !== null) {
+            stack.push(node);
+            node = node.next;
+        }
+        let previousNode= stack.pop()!;
+        this.snek.head = previousNode;
+        let currentNode = stack.pop() || null;
+        while (currentNode !== null) {
+            previousNode.next = currentNode;
+            currentNode.next = null;
+            previousNode = currentNode;
+            currentNode = stack.pop() || null;
+        }
+        this.snek.tail = previousNode;
+        this.setDirection(oppositeDirection(this.direction));
+    }
+
 	tick(): 'GAME_OVER' | 'OK' {
 		const snekHead = this.snek.head;
 		const nextPos = adjacentCoords(
@@ -172,14 +206,15 @@ class GameEngine {
 			this.width()
 		);
 		const nextChunk = this.board[nextPos.x][nextPos.y];
-		if (nextChunk === BoardChunk.SNEK) {
+		const tailCoords = { x: this.snek.tail.x, y: this.snek.tail.y };
+		if (nextChunk === BoardChunk.SNEK && tailCoords.x !== nextPos.x && tailCoords.y !== nextPos.y) {
 			return 'GAME_OVER';
 		}
 		if (nextChunk === BoardChunk.FOOD) {
 			this.addChunk();
-            this.spawnFood();
+			this.spawnFood();
 		}
-        this.move(nextPos.x, nextPos.y);
+		this.move(nextPos.x, nextPos.y);
 		return 'OK';
 	}
 
@@ -187,20 +222,18 @@ class GameEngine {
 		console.info('Adding chunk');
 		const snekTail = this.snek.tail;
 		const possibleNewChunks = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
-        .filter((direction) => direction !== this.direction)
-        .map(
-			(direction) => {
+			.filter((direction) => direction !== this.direction)
+			.map((direction) => {
 				return adjacentCoords(
 					{ x: snekTail.x, y: snekTail.y },
 					direction,
 					this.height(),
 					this.width()
 				);
-			}
-		);
-        console.info(possibleNewChunks)
+			});
+		console.info(possibleNewChunks);
 		const newChunk = possibleNewChunks[randomInt(possibleNewChunks.length)];
-        console.info(newChunk)
+		console.info(newChunk);
 		this.snek.addNode(new SnekNode(newChunk.x, newChunk.y));
 		this.updateBoard(newChunk.x, newChunk.y, BoardChunk.SNEK);
 	}

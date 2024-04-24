@@ -11,6 +11,9 @@
 	let hooks: Writable<BoardChunk>[][];
 	function onKeyDown(event: KeyboardEvent) {
 		switch (event.key) {
+            case 'r':
+                game.reverse();
+                break;
 			case 'ArrowUp':
 				game.setDirection(Direction.UP);
 				break;
@@ -36,6 +39,7 @@
             body: 'You lost!',
             buttonTextCancel: 'Try Again!',
             image: 'https://media3.giphy.com/media/JUSwkiO1Eh5K43ruN0/giphy.gif',
+            response: () => { window.location.reload() }
         };
         modalStore.trigger(alert);
     }

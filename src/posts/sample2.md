@@ -1,10 +1,9 @@
 ---
-title: Sample Post
+title: Sample Post 2
 description: Just to have something on this page.
 published: true
 categories:
-  - Sample
-  - kubernetes
+  - Different
 date: 2023-01-10
 ---
 
